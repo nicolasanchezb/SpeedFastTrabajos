@@ -1,270 +1,347 @@
 # SpeedFast
 
-Sistema de gestión de pedidos para una empresa de reparto a domicilio, desarrollado en **Java** como parte de una actividad formativa sobre **sobrecarga y sobreescritura en clases derivadas**.
+SpeedFast es una aplicación desarrollada en Java que representa el funcionamiento básico de una empresa de entregas. El sistema permite registrar diferentes tipos de pedidos y calcular sus tiempos estimados de entrega mediante clases abstractas, herencia, sobrescritura y polimorfismo.
 
-## 📌 Descripción
+## Información académica
 
-**SpeedFast** es un prototipo de sistema orientado a objetos que permite representar diferentes tipos de pedidos y la asignación de repartidores según las características de cada servicio.
+- **Actividad:** Cálculo polimórfico mediante clases abstractas
+- **Semana:** 2
+- **Carrera:** Analista Programador Computacional
+- **Estudiante:** Nicolas Sanchez Bustos
+- **Lenguaje:** Java
+- **IDE:** IntelliJ IDEA
+- **JDK:** 25
 
-El sistema contempla tres tipos de pedidos:
+## Objetivo del proyecto
 
-* 🍔 **Pedido de Comida:** requiere un repartidor con mochila térmica.
-* 📦 **Pedido de Encomienda:** requiere validación del peso y embalaje.
-* 🛒 **Pedido Express:** requiere un repartidor cercano y con disponibilidad inmediata.
+El objetivo del proyecto es desarrollar una jerarquía de clases que permita representar diferentes tipos de pedidos.
 
-Además, se incorpora una situación especial para pedidos Express, donde un repartidor cercano puede tener espacio disponible para realizar un **doble pedido**.
+Cada pedido incluye la siguiente información:
 
-## 🎯 Objetivo
+- Identificador del pedido.
+- Dirección de entrega.
+- Distancia en kilómetros.
+- Tipo de entrega.
+- Factores que afectan su duración.
+- Tiempo estimado de entrega.
 
-El objetivo principal es aplicar conceptos fundamentales de la programación orientada a objetos:
+Cada tipo de pedido implementa una fórmula diferente para calcular su tiempo estimado.
 
-* Herencia.
-* Polimorfismo.
-* Sobrecarga de métodos.
-* Sobreescritura de métodos.
-* Uso de la anotación `@Override`.
-* Creación de objetos mediante clases derivadas.
-
-## 🏗️ Estructura del proyecto
-
-```text
-SpeedFast/
-└── src/
-    ├── Pedido.java
-    ├── PedidoComida.java
-    ├── PedidoEncomienda.java
-    ├── PedidoExpress.java
-    └── Main.java
-```
-
-### 📄 Descripción de las clases
-
-#### `Pedido.java`
-
-Es la clase base del sistema.
-
-Contiene los atributos generales:
-
-* `idPedido`
-* `direccionEntrega`
-* `tipoPedido`
-
-También define las diferentes versiones del método `asignarRepartidor()`.
-
-#### `PedidoComida.java`
-
-Hereda de `Pedido` y representa los pedidos provenientes de restaurantes.
-
-Su lógica considera que el repartidor debe contar con una **mochila térmica**.
-
-#### `PedidoEncomienda.java`
-
-Hereda de `Pedido` y representa documentos o paquetes.
-
-Su lógica considera la **validación del peso y las condiciones del embalaje**.
-
-#### `PedidoExpress.java`
-
-Hereda de `Pedido` y representa compras realizadas en supermercados o farmacias.
-
-Su lógica considera la **cercanía del repartidor, disponibilidad inmediata y espacio para realizar un doble pedido**.
-
-#### `Main.java`
-
-Contiene el método `main()` y permite probar el funcionamiento del sistema.
-
-Se crean diferentes pedidos y se ejecutan los métodos sobrecargados y sobrescritos.
-
-## 🔄 Polimorfismo
-
-El proyecto utiliza polimorfismo mediante la redefinición del método:
-
-```java
-public void asignarRepartidor()
-```
-
-Cada clase derivada entrega un comportamiento diferente.
-
-### Pedido de comida
+## Estructura del proyecto
 
 ```text
-Buscando repartidor con mochila térmica.
+SpeedFast
+└── src
+    ├── app
+    │   └── Main.java
+    │
+    └── model
+        ├── Pedido.java
+        ├── PedidoComida.java
+        ├── PedidoEncomienda.java
+        └── PedidoExpress.java
 ```
 
-### Pedido de encomienda
+## Organización de los paquetes
+
+### Paquete `app`
+
+Contiene la clase principal del programa:
+
+- `Main.java`
+
+Esta clase crea los pedidos, ejecuta los métodos y muestra los resultados en la consola.
+
+### Paquete `model`
+
+Contiene las clases relacionadas con el modelo de los pedidos:
+
+- `Pedido.java`
+- `PedidoComida.java`
+- `PedidoEncomienda.java`
+- `PedidoExpress.java`
+
+## Descripción de las clases
+
+### Pedido
+
+`Pedido` es una clase abstracta que contiene la información común de todos los pedidos.
+
+Sus atributos son:
+
+- `idPedido`: identificador único del pedido.
+- `direccionEntrega`: dirección en la que se realizará la entrega.
+- `distanciaKm`: distancia de la entrega expresada en kilómetros.
+
+También contiene el método implementado `mostrarResumen()`, encargado de mostrar los datos principales del pedido.
+
+La clase declara los siguientes métodos abstractos:
+
+- `calcularTiempoEntrega()`
+- `obtenerTipoEntrega()`
+- `obtenerFactoresDuracion()`
+
+Estos métodos deben ser implementados por cada clase derivada.
+
+### PedidoComida
+
+Representa un pedido de comida.
+
+Su tiempo estimado se calcula mediante la siguiente fórmula:
 
 ```text
-Validando peso y condiciones del embalaje.
+Tiempo = 15 minutos + 2 minutos por cada kilómetro
 ```
 
-### Pedido Express
+Ejemplo para una distancia de 4 kilómetros:
 
 ```text
-Buscando al repartidor más cercano.
-Verificando disponibilidad inmediata.
+Tiempo = 15 + (2 × 4)
+Tiempo = 23 minutos
 ```
 
-## 🔁 Sobrecarga de métodos
+### PedidoEncomienda
 
-El proyecto implementa diferentes versiones del método `asignarRepartidor()`:
+Representa la entrega de una encomienda.
 
-```java
-asignarRepartidor()
+Su tiempo estimado se calcula mediante la siguiente fórmula:
+
+```text
+Tiempo = 20 minutos + 1,5 minutos por cada kilómetro
 ```
 
-```java
-asignarRepartidor(String nombreRepartidor)
+El resultado se ajusta a un número entero mediante `Math.round()`.
+
+Ejemplo para una distancia de 5 kilómetros:
+
+```text
+Tiempo = 20 + (1,5 × 5)
+Tiempo = 27,5
+Tiempo redondeado = 28 minutos
 ```
 
-```java
-asignarRepartidor(String nombreRepartidor, String calle)
+### PedidoExpress
+
+Representa un pedido de entrega express.
+
+El tiempo base es de 10 minutos. Si la distancia es superior a 5 kilómetros, se agregan 5 minutos adicionales.
+
+```text
+Distancia de hasta 5 km: 10 minutos
+Distancia superior a 5 km: 15 minutos
 ```
 
-Cada versión posee una firma diferente y permite realizar distintas operaciones.
+Ejemplo para una distancia de 8 kilómetros:
 
-Por ejemplo:
+```text
+Tiempo base = 10 minutos
+Tiempo adicional = 5 minutos
+Tiempo total = 15 minutos
+```
+
+### Main
+
+`Main` es el punto de entrada de la aplicación.
+
+Esta clase realiza las siguientes acciones:
+
+- Crea un objeto de tipo `PedidoComida`.
+- Crea un objeto de tipo `PedidoEncomienda`.
+- Crea un objeto de tipo `PedidoExpress`.
+- Almacena los objetos en un arreglo de tipo `Pedido`.
+- Recorre el arreglo mediante un ciclo `for`.
+- Ejecuta `mostrarResumen()` para cada pedido.
+- Ejecuta `calcularTiempoEntrega()` para cada pedido.
+- Presenta una comparación final de los tiempos.
+
+## Conceptos de programación aplicados
+
+### Abstracción
+
+La clase `Pedido` se declara como abstracta:
 
 ```java
-expressCercano.asignarRepartidor(
-        "Juan",
-        "Av. Providencia"
+public abstract class Pedido
+```
+
+Esto significa que no se pueden crear objetos directamente a partir de ella. Su función es proporcionar una estructura común para las clases derivadas.
+
+### Herencia
+
+Las clases específicas heredan de la clase `Pedido` mediante la palabra reservada `extends`.
+
+Ejemplo:
+
+```java
+public class PedidoComida extends Pedido
+```
+
+Gracias a la herencia, las clases derivadas reciben los atributos y métodos definidos en la clase abstracta.
+
+### Sobrescritura de métodos
+
+Cada clase derivada implementa su propia versión del método `calcularTiempoEntrega()`.
+
+Para indicar que un método está siendo sobrescrito se utiliza la anotación:
+
+```java
+@Override
+```
+
+Esto permite que cada tipo de pedido tenga una lógica diferente para calcular su tiempo.
+
+### Polimorfismo
+
+Los objetos de las clases derivadas se almacenan utilizando referencias de tipo `Pedido`.
+
+```java
+Pedido pedidoComida = new PedidoComida(
+        101,
+        "Avenida Alemania 450",
+        4
 );
 ```
 
-Esta versión permite indicar el nombre del repartidor y la calle donde se encuentra.
-
-## 👥 Ejemplos utilizados
-
-| Pedido | Tipo       | Repartidor | Situación                               |
-| ------ | ---------- | ---------- | --------------------------------------- |
-| 101    | Comida     | Carlos     | Requiere mochila térmica                |
-| 102    | Encomienda | Javier     | Validación de peso y embalaje           |
-| 103    | Express    | Felipe     | Repartidor cercano y disponible         |
-| 104    | Express    | Juan       | Cercano y con espacio para doble pedido |
-
-## 🖥️ Tecnologías utilizadas
-
-* **Java**
-* **IntelliJ IDEA**
-* **JDK 25**
-* **Git**
-* **GitHub**
-
-## ▶️ Ejecución del proyecto
-
-### 1. Clonar el repositorio
-
-Desde una terminal:
-
-```bash
-git clone URL_DEL_REPOSITORIO
-```
-
-### 2. Abrir el proyecto
-
-Abrir la carpeta del proyecto utilizando **IntelliJ IDEA**.
-
-### 3. Verificar el JDK
-
-Configurar el proyecto para utilizar una versión compatible de Java.
-
-Para este proyecto se utilizó:
-
-```text
-JDK 25
-```
-
-### 4. Ejecutar el programa
-
-Abrir:
-
-```text
-src/Main.java
-```
-
-y ejecutar el método:
+También se utiliza un arreglo polimórfico:
 
 ```java
-public static void main(String[] args)
+Pedido[] pedidos = {
+        pedidoComida,
+        pedidoEncomienda,
+        pedidoExpress
+};
 ```
 
-## 📋 Salida esperada
+Esto permite recorrer y procesar diferentes tipos de pedidos utilizando una misma estructura.
 
-Al ejecutar el programa se mostrarán mensajes similares a:
+### Encapsulamiento
+
+Los atributos comunes son administrados por la clase `Pedido`.
+
+Para consultar el identificador desde la clase `Main`, se utiliza el método:
+
+```java
+public int getIdPedido() {
+    return idPedido;
+}
+```
+
+### Estructura condicional
+
+La clase `PedidoExpress` utiliza una estructura `if` para comprobar si la distancia supera los 5 kilómetros.
+
+```java
+if (distanciaKm > 5) {
+    tiempo = tiempo + 5;
+}
+```
+
+### Estructura repetitiva
+
+La clase `Main` utiliza un ciclo `for` mejorado para recorrer el arreglo de pedidos.
+
+```java
+for (Pedido pedido : pedidos) {
+    pedido.mostrarResumen();
+}
+```
+
+## Ejemplo de ejecución
 
 ```text
-====================================
-          SISTEMA SPEEDFAST
-====================================
+==================================
+       SISTEMA SPEEDFAST
+==================================
+ID del pedido: 101
+Dirección de entrega: Avenida Alemania 450
+Distancia: 4.0 km
+Tipo de entrega: Pedido de comida
+Factores que afectan su duración: 15 minutos base más 2 minutos por cada kilómetro
+Tiempo estimado de entrega: 23 minutos
+----------------------------------
+ID del pedido: 102
+Dirección de entrega: Calle Independencia 820
+Distancia: 5.0 km
+Tipo de entrega: Pedido de encomienda
+Factores que afectan su duración: 20 minutos base más 1,5 minutos por cada kilómetro
+Tiempo estimado de entrega: 28 minutos
+----------------------------------
+ID del pedido: 103
+Dirección de entrega: Avenida Pedro Montt 1200
+Distancia: 8.0 km
+Tipo de entrega: Pedido express
+Factores que afectan su duración: 10 minutos base más 5 minutos adicionales por superar los 5 kilómetros
+Tiempo estimado de entrega: 15 minutos
+----------------------------------
 
---- SOBRESCRITURA ---
-
-Pedido de comida #101
-Buscando repartidor con mochila térmica.
-Pedido listo para ser asignado.
-
-Pedido de encomienda #102
-Validando peso y condiciones del embalaje.
-Buscando repartidor disponible.
-
-Pedido Express #103
-Buscando al repartidor más cercano.
-Verificando disponibilidad inmediata.
-
---- SOBRECARGA ---
-
-Pedido de comida #101
-Repartidor asignado: Carlos
-Validación: el repartidor debe contar con mochila térmica.
-
-Pedido de encomienda #102
-Repartidor asignado: Javier
-Validación: peso y embalaje de la encomienda verificados.
-
-Pedido Express #103
-Repartidor asignado: Felipe
-Validación: repartidor cercano y con disponibilidad inmediata.
-
-Pedido Express #104
-Repartidor: Juan
-Ubicación: cercano a Av. Providencia
-Validación: repartidor cercano.
-Espacio disponible para realizar un doble pedido.
-
-====================================
-           FIN DEL SISTEMA
-====================================
+COMPARACIÓN DE TIEMPOS
+----------------------------------
+Pedido 101 | Pedido de comida | 23 minutos
+Pedido 102 | Pedido de encomienda | 28 minutos
+Pedido 103 | Pedido express | 15 minutos
 ```
 
-## 📚 Conceptos aplicados
+## Requisitos
 
-Este proyecto permite demostrar los siguientes conceptos de programación orientada a objetos:
+Para ejecutar el proyecto se necesita:
 
-**Herencia:** las clases `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` heredan atributos y comportamientos de `Pedido`.
+- IntelliJ IDEA.
+- Java Development Kit, JDK 25 o compatible.
+- Git, en caso de utilizar el control de versiones.
+- Una cuenta de GitHub para publicar el repositorio.
 
-**Sobreescritura:** las clases derivadas modifican el comportamiento del método `asignarRepartidor()` utilizando `@Override`.
+## Instrucciones de ejecución
 
-**Sobrecarga:** se utilizan diferentes versiones de `asignarRepartidor()` con distintos parámetros.
+1. Descargar o clonar el repositorio.
+2. Abrir IntelliJ IDEA.
+3. Seleccionar la opción `File`.
+4. Seleccionar `Open`.
+5. Buscar y abrir la carpeta del proyecto `SpeedFast`.
+6. Verificar que el JDK esté configurado correctamente.
+7. Abrir el archivo `src/app/Main.java`.
+8. Presionar el botón verde de ejecución.
+9. Revisar los resultados en la consola.
 
-**Polimorfismo:** una misma operación puede presentar comportamientos diferentes dependiendo del tipo de pedido.
+## Actualización de la semana 2
 
-## 👨‍💻 Autor
+Durante la semana 2 se realizaron los siguientes cambios:
 
-**Nicolas Sanchez Bustos**
+- Se creó la clase abstracta `Pedido`.
+- Se agregaron los atributos comunes de los pedidos.
+- Se implementó el método `mostrarResumen()`.
+- Se creó el método abstracto `calcularTiempoEntrega()`.
+- Se creó la clase `PedidoComida`.
+- Se creó la clase `PedidoEncomienda`.
+- Se creó la clase `PedidoExpress`.
+- Se implementaron fórmulas diferenciadas para calcular los tiempos.
+- Se incorporó el tipo de entrega de cada pedido.
+- Se incorporaron los factores que afectan la duración.
+- Se utilizó `Math.round()` para ajustar el tiempo de las encomiendas.
+- Se utilizó una estructura `if` en los pedidos express.
+- Se implementó polimorfismo mediante un arreglo de tipo `Pedido`.
+- Se organizó el proyecto en los paquetes `app` y `model`.
+- Se actualizó la salida de la aplicación para comparar los tiempos.
 
-Estudiante de **Analista Programador Computacional**.
+## Control de versiones
 
-Proyecto desarrollado con fines académicos.
+El proyecto utiliza Git y GitHub para registrar las actualizaciones realizadas durante las distintas semanas de desarrollo.
 
-## 📌 Estado del proyecto
+Mensaje de commit recomendado para esta actualización:
 
-**Completado — Actividad formativa Semana 1**
+```text
+Semana 2: implementación de clase abstracta Pedido y cálculo de tiempos
+```
 
-El proyecto cumple con la implementación solicitada de:
+## Entrega
 
-* Clase base `Pedido`.
-* Tres clases derivadas.
-* Sobreescritura de métodos.
-* Sobrecarga de métodos.
-* Pruebas mediante `Main`.
-* Mensajes informativos en consola.
+Para entregar la actividad se deben proporcionar los siguientes elementos:
+
+- Enlace público del repositorio de GitHub.
+- Proyecto completo comprimido en formato `.zip` o `.rar`.
+- Código correctamente organizado en los paquetes `app` y `model`.
+- Repositorio actualizado con los commits correspondientes a la semana 2.
+
+## Autor
+
+**Nicolas Sanchez Bustos**  
+Estudiante de Analista Programador Computacional
