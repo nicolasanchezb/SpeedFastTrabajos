@@ -1,129 +1,140 @@
-# SpeedFast – Semana 4
+# SpeedFast - Semana 5
 
-## Ejecutando tareas en paralelo con hilos en Java
+## Sincronizando procesos en sistemas concurrentes
 
-Proyecto desarrollado para simular el proceso de entrega de pedidos de la empresa **SpeedFast**. En esta cuarta semana se incorporó programación concurrente mediante `Runnable`, `Thread.sleep()` y `ExecutorService`, permitiendo que varios repartidores realicen entregas simultáneamente.
+Proyecto desarrollado para la actividad formativa individual de la quinta semana de la asignatura de Programación. El sistema simula la coordinación de entregas de la empresa **SpeedFast**, donde varios repartidores trabajan de manera simultánea y acceden a una zona de carga compartida.
+
+La solución utiliza programación concurrente y métodos sincronizados para impedir que dos repartidores retiren el mismo pedido.
 
 ## Objetivo
 
-Aplicar programación multihilo en Java dentro de una estructura orientada a objetos. Cada repartidor se ejecuta como una tarea independiente, recorre secuencialmente su lista de pedidos y muestra en consola el avance de sus entregas.
+Implementar mecanismos de sincronización en Java para controlar el acceso concurrente a un recurso compartido, evitando condiciones de carrera y garantizando que cada pedido sea retirado y entregado por un único repartidor.
 
 ## Funcionalidades
 
-- Registro de pedidos de comida, encomienda y express.
-- Cálculo diferenciado del tiempo estimado según el tipo de pedido.
-- Creación de tres repartidores con dos pedidos asignados a cada uno.
-- Ejecución simultánea de los repartidores.
-- Procesamiento secuencial de los pedidos de cada repartidor.
-- Simulación de las entregas mediante pausas aleatorias.
-- Visualización del progreso y finalización de cada entrega en consola.
-- Espera del programa principal hasta que todos los repartidores terminen.
+- Registro de pedidos en una zona de carga compartida.
+- Manejo de los estados `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
+- Ejecución simultánea de tres repartidores.
+- Retiro sincronizado de pedidos desde la zona de carga.
+- Simulación del tiempo de entrega mediante `Thread.sleep()`.
+- Actualización del estado de cada pedido durante el proceso.
+- Finalización controlada mediante `ExecutorService`.
+- Confirmación en consola cuando todos los pedidos han sido entregados.
+
+## Tecnologías utilizadas
+
+- Java
+- Programación orientada a objetos
+- `Runnable`
+- `ExecutorService`
+- `synchronized`
+- `Thread.sleep()`
+- `ArrayList`
+- IntelliJ IDEA
+- JDK 25
 
 ## Estructura del proyecto
 
 ```text
-src/
-├── app/
-│   └── Main.java
-├── model/
-│   ├── Pedido.java
-│   ├── PedidoComida.java
-│   ├── PedidoEncomienda.java
-│   ├── PedidoExpress.java
-│   └── Repartidor.java
-├── interfaces/
-│   ├── Despachable.java
-│   ├── Cancelable.java
-│   └── Rastreable.java
-└── service/
-    └── ControladorDeEnvios.java
+semana 5
+├── README.md
+└── src
+    ├── app
+    │   └── Main.java
+    ├── interfaces
+    │   ├── Cancelable.java
+    │   ├── Despachable.java
+    │   └── Rastreable.java
+    ├── model
+    │   ├── EstadoPedido.java
+    │   ├── Pedido.java
+    │   ├── PedidoComida.java
+    │   ├── PedidoEncomienda.java
+    │   ├── PedidoExpress.java
+    │   ├── Repartidor.java
+    │   └── ZonaDeCarga.java
+    └── service
+        └── ControladorDeEnvios.java
 ```
 
-## Descripción de las clases principales
+## Clases principales
 
 ### `Pedido`
 
-Clase abstracta que contiene los atributos comunes de los pedidos:
+Clase abstracta que contiene los datos comunes de los pedidos, como identificador, dirección de entrega, distancia, repartidor asignado y estado. Cada pedido comienza con el estado `PENDIENTE`.
 
-- `idPedido`
-- `direccionEntrega`
-- `distanciaKm`
-- `repartidorAsignado`
+### `EstadoPedido`
 
-También define métodos como `mostrarResumen()`, `calcularTiempoEntrega()`, `asignarRepartidor()`, `obtenerTipoEntrega()` y `obtenerFactoresDuracion()`.
+Enumeración que define los estados válidos de un pedido:
 
-### Tipos de pedido
+- `PENDIENTE`: el pedido se encuentra esperando en la zona de carga.
+- `EN_REPARTO`: un repartidor retiró el pedido y está realizando la entrega.
+- `ENTREGADO`: la entrega fue completada correctamente.
 
-- `PedidoComida`: calcula 15 minutos base más 2 minutos por kilómetro.
-- `PedidoEncomienda`: calcula 20 minutos base más 1,5 minutos por kilómetro.
-- `PedidoExpress`: calcula 10 minutos y agrega 5 minutos cuando la distancia supera los 5 kilómetros.
+### `ZonaDeCarga`
+
+Representa el recurso compartido del sistema. Almacena los pedidos pendientes y utiliza métodos `synchronized` para controlar el acceso a la lista.
+
+El método `retirarPedido()` ejecuta de forma atómica las siguientes acciones:
+
+1. Busca un pedido pendiente.
+2. Cambia su estado a `EN_REPARTO`.
+3. Lo elimina de la zona de carga.
+4. Lo entrega al repartidor que realizó la solicitud.
+
+Esto evita que dos repartidores retiren el mismo pedido.
 
 ### `Repartidor`
 
-Implementa la interfaz `Runnable`. Cada objeto repartidor mantiene una lista de pedidos y, dentro de su método `run()`, realiza las siguientes acciones:
-
-1. Informa el inicio de su jornada.
-2. Recorre secuencialmente sus pedidos asignados.
-3. Informa qué pedido está entregando.
-4. Simula el proceso mediante `Thread.sleep()` con una duración aleatoria.
-5. Informa la finalización de cada pedido.
-6. Comunica cuando termina todas sus entregas.
+Implementa la interfaz `Runnable`. Cada repartidor trabaja de forma independiente, retira pedidos de la zona compartida, simula la entrega y cambia el estado a `ENTREGADO`.
 
 ### `Main`
 
-Crea seis pedidos y tres repartidores: Juan, María y Alexis. A cada repartidor se le asignan dos pedidos. Las tareas se envían a un grupo de tres hilos mediante `ExecutorService`.
+Crea una zona de carga, agrega seis pedidos e inicia tres repartidores llamados Juan, María y Alexis. Los repartidores se ejecutan utilizando un `ExecutorService` con tres hilos.
 
-El método `shutdown()` impide el ingreso de nuevas tareas y `awaitTermination()` mantiene la simulación en ejecución hasta que todos los repartidores finalizan.
+El método `awaitTermination()` permite que el hilo principal espere hasta que todas las entregas hayan finalizado.
 
-## Conceptos aplicados
+## Funcionamiento de la sincronización
 
-- Programación orientada a objetos.
-- Herencia y clases abstractas.
-- Polimorfismo y sobrescritura de métodos.
-- Interfaces.
-- Colecciones con `ArrayList` y `List`.
-- Implementación de `Runnable`.
-- Ejecución concurrente con `ExecutorService`.
-- Pausas con `Thread.sleep()`.
-- Tiempos aleatorios con `ThreadLocalRandom`.
-- Manejo de `InterruptedException`.
+Aunque los repartidores se ejecutan simultáneamente, el método sincronizado de la zona de carga permite que solamente un hilo retire un pedido a la vez. Cuando un repartidor termina de retirar el pedido, el acceso queda disponible para otro hilo.
 
-## Ejemplo de ejecución
+Los mensajes pueden aparecer en un orden diferente en cada ejecución, ya que el sistema operativo decide qué hilo se ejecuta primero. Sin embargo, cada pedido debe aparecer una sola vez como entregado.
+
+## Ejemplo de salida
 
 ```text
 ==================================
-   SIMULACIÓN DE ENTREGAS
+       SISTEMA SPEEDFAST
 ==================================
-Juan comenzó su jornada de entregas.
-María comenzó su jornada de entregas.
-Alexis comenzó su jornada de entregas.
-Juan está entregando el pedido 101 en Avenida Alemania 450
-María está entregando el pedido 103 en Calle Independencia 820
-Alexis está entregando el pedido 105 en Avenida Pedro Montt 1200
-...
+Pedido 101 agregado a la zona de carga.
+Pedido 102 agregado a la zona de carga.
+Pedido 103 agregado a la zona de carga.
+Juan retiró el pedido 101 - Estado: EN_REPARTO
+María retiró el pedido 102 - Estado: EN_REPARTO
+Alexis retiró el pedido 103 - Estado: EN_REPARTO
+Juan entregó el pedido 101 - Estado: ENTREGADO
+María entregó el pedido 102 - Estado: ENTREGADO
+Alexis entregó el pedido 103 - Estado: ENTREGADO
 ==================================
-TODAS LAS ENTREGAS FUERON COMPLETADAS
+Todos los pedidos han sido entregados correctamente
 ==================================
 ```
 
-El orden de los mensajes puede cambiar en cada ejecución, debido a que los repartidores trabajan concurrentemente.
+El orden de los repartidores y pedidos puede cambiar en cada ejecución debido al trabajo concurrente.
 
-## Requisitos
-
-- IntelliJ IDEA.
-- Java Development Kit (JDK) 25 o una versión compatible.
-
-## Instrucciones de ejecución
+## Cómo ejecutar el proyecto
 
 1. Abrir el proyecto en IntelliJ IDEA.
-2. Verificar que el JDK esté configurado correctamente.
-3. Abrir la clase `Main`, ubicada en el paquete `app`.
+2. Comprobar que el proyecto tenga configurado un JDK compatible.
+3. Abrir `src/app/Main.java`.
 4. Ejecutar el método `main()`.
-5. Observar en consola el avance simultáneo de los repartidores.
+5. Revisar en la consola el retiro y la entrega de los pedidos.
+
+## Resultado
+
+El sistema permite que tres repartidores procesen pedidos en paralelo sin producir entregas duplicadas. La sincronización aplicada en la zona de carga protege el recurso compartido y mantiene la integridad de los estados de los pedidos.
 
 ## Autor
 
 **Nicolas Sanchez B.**  
 Carrera: Analista Programador Computacional
-
-Proyecto funcional y ejecutado correctamente con código de salida `0`.
