@@ -1,140 +1,96 @@
-# SpeedFast - Semana 5
+# SpeedFast - Semana 6: Gestión de entregas con interfaz gráfica
 
-## Sincronizando procesos en sistemas concurrentes
+**Autor:** Nicolas Sanchez Bustos  
+**Carrera:** Analista Programador Computacional
 
-Proyecto desarrollado para la actividad formativa individual de la quinta semana de la asignatura de Programación. El sistema simula la coordinación de entregas de la empresa **SpeedFast**, donde varios repartidores trabajan de manera simultánea y acceden a una zona de carga compartida.
+Aplicación de escritorio desarrollada en Java Swing para registrar pedidos, consultar su estado, asignar repartidores y simular entregas concurrentes.
 
-La solución utiliza programación concurrente y métodos sincronizados para impedir que dos repartidores retiren el mismo pedido.
-
-## Objetivo
-
-Implementar mecanismos de sincronización en Java para controlar el acceso concurrente a un recurso compartido, evitando condiciones de carrera y garantizando que cada pedido sea retirado y entregado por un único repartidor.
+Este proyecto continúa el trabajo de las semanas anteriores y utiliza las clases `Pedido`, `PedidoComida`, `PedidoEncomienda`, `PedidoExpress`, `Repartidor` y `ZonaDeCarga`.
 
 ## Funcionalidades
 
-- Registro de pedidos en una zona de carga compartida.
-- Manejo de los estados `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
-- Ejecución simultánea de tres repartidores.
-- Retiro sincronizado de pedidos desde la zona de carga.
-- Simulación del tiempo de entrega mediante `Thread.sleep()`.
-- Actualización del estado de cada pedido durante el proceso.
-- Finalización controlada mediante `ExecutorService`.
-- Confirmación en consola cuando todos los pedidos han sido entregados.
-
-## Tecnologías utilizadas
-
-- Java
-- Programación orientada a objetos
-- `Runnable`
-- `ExecutorService`
-- `synchronized`
-- `Thread.sleep()`
-- `ArrayList`
-- IntelliJ IDEA
-- JDK 25
+- Registrar pedidos de comida, encomienda y tipo express.
+- Validar ID, dirección y distancia antes de guardar.
+- Evitar el registro de IDs duplicados.
+- Mostrar los pedidos en una tabla con su tipo, distancia, repartidor, estado y tiempo estimado.
+- Asignar un repartidor a un pedido pendiente.
+- Iniciar una simulación de entregas con tres repartidores concurrentes.
+- Actualizar la tabla para observar los cambios de estado.
 
 ## Estructura del proyecto
 
 ```text
-semana 5
-├── README.md
-└── src
-    ├── app
-    │   └── Main.java
-    ├── interfaces
-    │   ├── Cancelable.java
-    │   ├── Despachable.java
-    │   └── Rastreable.java
-    ├── model
-    │   ├── EstadoPedido.java
-    │   ├── Pedido.java
-    │   ├── PedidoComida.java
-    │   ├── PedidoEncomienda.java
-    │   ├── PedidoExpress.java
-    │   ├── Repartidor.java
-    │   └── ZonaDeCarga.java
-    └── service
-        └── ControladorDeEnvios.java
+src/
+├── main/
+│   └── Main.java
+├── ui/
+│   ├── VentanaPrincipal.java
+│   ├── VentanaRegistroPedido.java
+│   └── VentanaListaPedidos.java
+├── service/
+│   ├── GestorPedidos.java
+│   └── ControladorDeEnvios.java
+├── model/
+│   ├── Pedido.java
+│   ├── PedidoComida.java
+│   ├── PedidoEncomienda.java
+│   ├── PedidoExpress.java
+│   ├── EstadoPedido.java
+│   ├── Repartidor.java
+│   └── ZonaDeCarga.java
+├── interfaces/
+│   ├── Cancelable.java
+│   ├── Despachable.java
+│   └── Rastreable.java
+└── app/
+    └── Main.java
 ```
 
-## Clases principales
+`app.Main` conserva la demostración por consola de la semana anterior. La interfaz gráfica se inicia desde `main.Main`.
 
-### `Pedido`
+## Cómo ejecutar
 
-Clase abstracta que contiene los datos comunes de los pedidos, como identificador, dirección de entrega, distancia, repartidor asignado y estado. Cada pedido comienza con el estado `PENDIENTE`.
+1. Abre el proyecto en IntelliJ IDEA.
+2. Verifica que el proyecto tenga configurado un JDK.
+3. Ejecuta la clase `main.Main`.
+4. En la ventana principal, selecciona **Registrar pedido**, **Listar pedidos** o **Iniciar entregas**.
 
-### `EstadoPedido`
+## Uso de la aplicación
 
-Enumeración que define los estados válidos de un pedido:
+### Registrar un pedido
 
-- `PENDIENTE`: el pedido se encuentra esperando en la zona de carga.
-- `EN_REPARTO`: un repartidor retiró el pedido y está realizando la entrega.
-- `ENTREGADO`: la entrega fue completada correctamente.
+Ingresa un ID positivo, una dirección y una distancia mayor que cero. Después selecciona el tipo de pedido y pulsa **Guardar**. La aplicación mostrará una confirmación si el registro fue correcto.
 
-### `ZonaDeCarga`
+### Consultar y asignar
 
-Representa el recurso compartido del sistema. Almacena los pedidos pendientes y utiliza métodos `synchronized` para controlar el acceso a la lista.
+Abre **Listar pedidos** para ver la tabla. Selecciona un pedido pendiente y pulsa **Asignar repartidor al seleccionado**. El botón **Refrescar** vuelve a cargar los datos de la tabla; mientras la ventana está abierta, también se actualiza automáticamente.
 
-El método `retirarPedido()` ejecuta de forma atómica las siguientes acciones:
+### Iniciar entregas
 
-1. Busca un pedido pendiente.
-2. Cambia su estado a `EN_REPARTO`.
-3. Lo elimina de la zona de carga.
-4. Lo entrega al repartidor que realizó la solicitud.
+Pulsa **Iniciar entregas** en la ventana principal. Los repartidores procesarán los pedidos pendientes utilizando un grupo de tres hilos. Los estados permiten distinguir pedidos `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
 
-Esto evita que dos repartidores retiren el mismo pedido.
+## Pedidos de ejemplo
 
-### `Repartidor`
+Al iniciar la interfaz se cargan los pedidos de las semanas anteriores:
 
-Implementa la interfaz `Runnable`. Cada repartidor trabaja de forma independiente, retira pedidos de la zona compartida, simula la entrega y cambia el estado a `ENTREGADO`.
+| ID | Tipo | Dirección | Distancia |
+| --- | --- | --- | ---: |
+| 101 | Comida | Avenida Alemania 450 | 4 km |
+| 102 | Encomienda | Calle Independencia 820 | 6 km |
+| 103 | Express | Avenida Pedro Montt 1200 | 8 km |
+| 104 | Comida | Calle Los Robles 350 | 3 km |
+| 105 | Encomienda | Avenida Francia 740 | 5 km |
+| 106 | Express | Calle Simpson 225 | 2 km |
 
-### `Main`
+## Organización del código
 
-Crea una zona de carga, agrega seis pedidos e inicia tres repartidores llamados Juan, María y Alexis. Los repartidores se ejecutan utilizando un `ExecutorService` con tres hilos.
+- **`model`:** representa los pedidos, sus estados, los repartidores y la zona de carga.
+- **`service.GestorPedidos`:** mantiene la lista compartida de pedidos, valida IDs duplicados e inicia las entregas.
+- **`ui`:** contiene las ventanas Swing, los formularios, botones y la tabla.
+- **`main.Main`:** carga los pedidos de ejemplo y abre la ventana principal.
 
-El método `awaitTermination()` permite que el hilo principal espere hasta que todas las entregas hayan finalizado.
+La tabla utiliza `JTable` y `DefaultTableModel`. Las ventanas comparten una misma instancia de `GestorPedidos`, por lo que un pedido registrado puede verse desde la ventana de listado.
 
-## Funcionamiento de la sincronización
+## Alcance actual
 
-Aunque los repartidores se ejecutan simultáneamente, el método sincronizado de la zona de carga permite que solamente un hilo retire un pedido a la vez. Cuando un repartidor termina de retirar el pedido, el acceso queda disponible para otro hilo.
-
-Los mensajes pueden aparecer en un orden diferente en cada ejecución, ya que el sistema operativo decide qué hilo se ejecuta primero. Sin embargo, cada pedido debe aparecer una sola vez como entregado.
-
-## Ejemplo de salida
-
-```text
-==================================
-       SISTEMA SPEEDFAST
-==================================
-Pedido 101 agregado a la zona de carga.
-Pedido 102 agregado a la zona de carga.
-Pedido 103 agregado a la zona de carga.
-Juan retiró el pedido 101 - Estado: EN_REPARTO
-María retiró el pedido 102 - Estado: EN_REPARTO
-Alexis retiró el pedido 103 - Estado: EN_REPARTO
-Juan entregó el pedido 101 - Estado: ENTREGADO
-María entregó el pedido 102 - Estado: ENTREGADO
-Alexis entregó el pedido 103 - Estado: ENTREGADO
-==================================
-Todos los pedidos han sido entregados correctamente
-==================================
-```
-
-El orden de los repartidores y pedidos puede cambiar en cada ejecución debido al trabajo concurrente.
-
-## Cómo ejecutar el proyecto
-
-1. Abrir el proyecto en IntelliJ IDEA.
-2. Comprobar que el proyecto tenga configurado un JDK compatible.
-3. Abrir `src/app/Main.java`.
-4. Ejecutar el método `main()`.
-5. Revisar en la consola el retiro y la entrega de los pedidos.
-
-## Resultado
-
-El sistema permite que tres repartidores procesen pedidos en paralelo sin producir entregas duplicadas. La sincronización aplicada en la zona de carga protege el recurso compartido y mantiene la integridad de los estados de los pedidos.
-
-## Autor
-
-**Nicolas Sanchez B.**  
-Carrera: Analista Programador Computacional
+Los pedidos se mantienen en memoria mientras la aplicación está abierta. Al cerrarla, los pedidos registrados desde el formulario no se conservan. Los seis pedidos de ejemplo vuelven a crearse al iniciar el programa.
